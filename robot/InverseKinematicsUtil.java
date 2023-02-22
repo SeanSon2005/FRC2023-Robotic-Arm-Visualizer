@@ -39,7 +39,6 @@ public final class InverseKinematicsUtil {
             double lineAngle = angleCalc < 0 ? 360 + angleCalc : angleCalc;
             a1 = lineAngle*2 - a1;
             a2 = 360 - a2;
-            System.out.println(lineAngle);
         }
 
         //turret angle calculations

@@ -2,6 +2,7 @@ package robot;
 
 import java.awt.*;
 import javax.swing.*;
+import java.awt.image.BufferedImage;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
@@ -63,18 +64,21 @@ public class Simulate extends JFrame implements MouseListener, MouseMotionListen
         }
         repaint();
     }
-    public void paint(Graphics g){
-        super.paint(g); 
-        g.drawLine(CENTER_X, HEIGHT, CENTER_X, CENTER_Y);
-        g.drawLine(CENTER_X, HEIGHT, x_2, y_2);
-        g.drawLine(x_2, y_2, last_X, last_Y);
 
-        g.setFont(new Font("Bold", 1, 20)); 
-        g.drawString((Double.toString(x_coordinate) + " " + Double.toString(y_coordinate)), 100, 100); 
+    @Override
+    public void paint(Graphics g) 
+    {
+        BufferedImage bufferedImage = new BufferedImage(1000, 1000, BufferedImage.TYPE_4BYTE_ABGR);
+        Graphics2D g2d = bufferedImage.createGraphics();
+        g2d.drawLine(CENTER_X, HEIGHT, CENTER_X, CENTER_Y);
+        g2d.drawLine(CENTER_X, HEIGHT, x_2, y_2);
+        g2d.drawLine(x_2, y_2, last_X, last_Y);
 
-        //double[] coords = ForwardKinematicsUtil.getCoordinatesFromAngles(angles[0], angles[1], angles[2]);
-        //g.drawString((Double.toString(coords[0]) + " " + Double.toString(coords[1])) + " " + Double.toString(coords[2]), 100, 200); 
-        
+        g2d.setFont(new Font("Bold", 1, 20)); 
+        g2d.drawString((Double.toString(x_coordinate) + " " + Double.toString(y_coordinate)), 100, 100);
+
+        Graphics2D g2dComponent = (Graphics2D) g;
+        g2dComponent.drawImage(bufferedImage, null, 0, 0); 
     }
     public void mouseClicked(MouseEvent e)
     {
