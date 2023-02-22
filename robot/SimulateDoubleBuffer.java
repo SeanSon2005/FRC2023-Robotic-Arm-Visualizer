@@ -2,7 +2,6 @@ package robot;
 
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Image;
@@ -12,8 +11,6 @@ import javax.swing.JPanel;
 
 import robot.Constants.ArmConstants;
 
-import java.awt.image.BufferedImage;
-import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.*;
 
@@ -23,7 +20,7 @@ import java.awt.event.*;
  * @author bbrown
  *
  */
-public class BasicDoubleBufferSwing {
+public class SimulateDoubleBuffer{
     
     public static class Canvas extends JPanel implements MouseListener, MouseMotionListener, KeyListener{
         
