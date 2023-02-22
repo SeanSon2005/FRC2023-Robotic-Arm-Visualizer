@@ -38,7 +38,8 @@ public class Simulate{
         private int x_2 = 0;
         private int y_2 = 0;
         private int last_X = 0;
-        private int last_Y = 0;     
+        private int last_Y = 0;
+        private double angle[] = {0.0,0.0,0.0};   
         
         public Canvas() {
             this.setPreferredSize(new Dimension(1000, 1000));
@@ -105,7 +106,7 @@ public class Simulate{
 
             final Dimension d = getSize();
             if (offScreenImageDrawed == null) {   
-                // Double-buffer: clear the offscreen image.                
+                // Double-buffer: clear the offscreen image. 
                 offScreenImageDrawed = createImage(d.width, d.height);   
             }          
             offScreenGraphicsDrawed = offScreenImageDrawed.getGraphics();      
@@ -122,7 +123,8 @@ public class Simulate{
             g.drawLine(x_2, y_2, last_X, last_Y);
 
             g.setFont(new Font("Bold", 1, 20)); 
-            g.drawString((Double.toString(x_coordinate) + " " + Double.toString(y_coordinate)), 100, 100);                             
+            g.drawString((Double.toString(x_coordinate) + " " + Double.toString(y_coordinate)), 100, 100);        
+            g.drawString((Double.toString(angle[0]) + " " + Double.toString(angle[1]) + " " + Double.toString(angle[2])), 100, 150);                      
         }
         public void updateCoordinates(int x, int y){
             x_click = x;
@@ -131,11 +133,11 @@ public class Simulate{
             y_coordinate = convertPixeltoInches(CENTER_Y - y);
             double[] angles = InverseKinematicsUtil.getAnglesFromCoordinates(x_coordinate, y_coordinate, 0, flipped);
             if (!Double.isNaN(angles[0])){
+                angle = angles;
                 last_X = (int)x_click;
                 last_Y = (int)y_click;
                 y_2 = (int)(HEIGHT + convertInchestoPixel(ArmConstants.LIMB1_LENGTH * Math.cos(Math.toRadians(angles[0]))));
                 x_2 = (int)(CENTER_X - convertInchestoPixel(ArmConstants.LIMB1_LENGTH * Math.sin(Math.toRadians(angles[0]))));
-                //g.drawString((Double.toString(angles[0]) + " " + Double.toString(angles[1]) + " " + Double.toString(angles[2])), 100, 150); 
             }
             repaint();
             
@@ -163,10 +165,10 @@ public class Simulate{
       
     }
     public static double convertPixeltoInches(int pixel){
-        return ((double)pixel / 6);
+        return ((double)pixel / 7);
     }
     public static int convertInchestoPixel(double inch){
-        return (int)(inch * 6);
+        return (int)(inch * 7);
     }   
     
 } 
