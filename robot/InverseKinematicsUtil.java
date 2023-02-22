@@ -15,8 +15,8 @@ public final class InverseKinematicsUtil {
         double a1, a2, turretAngle;
         double adjusted_y = y - ArmConstants.ORIGIN_HEIGHT;   // calculate height relative to the origin (at the tip of the non-moving rod which holds the arm)
         double adjusted_x = x;
-        if (x < 0){
-            adjusted_x = 0;
+        if (x < 5){
+            adjusted_x = 5;
         }
         double adjusted_z = z;
         double dist3d = MathUtil.distance(0, adjusted_x, 0, adjusted_y, 0, z);     // calc distance in 3d from top pivot point
@@ -38,22 +38,30 @@ public final class InverseKinematicsUtil {
        
         //if flipped is true, return angles that are "flipped" 
         if(flipped){
-            double angleCalc = Math.toDegrees(Math.atan2(x, -y + ArmConstants.ORIGIN_HEIGHT));
+            double angleCalc = Math.toDegrees(Math.atan2(adjusted_x, -y + ArmConstants.ORIGIN_HEIGHT));
             double lineAngle = angleCalc < 0 ? 360 + angleCalc : angleCalc;
             a1 = lineAngle*2 - a1;
             a2 = 360 - a2;
+            if (a1 > 350){
+                a1 = 350;
+            }
+            if(a2 > 345){
+                a2 = 345;
+            }
         }
+        else{
+            if (a1 < 10){
+                a1 = 10;
+            }
+            if(a2 < 15){
+                a2 = 15;
+            }
+        }
+        
 
         //turret angle calculations
         double angleCalc = Math.toDegrees(Math.atan2(z, x));
         turretAngle = angleCalc < 0 ? 360 + angleCalc : angleCalc;
-        
-        if (a1 < 10){
-            a1 = 10;
-        }
-        if(a2 < 15){
-            a2 = 15;
-        }
 
         return new double[] {a1, a2, turretAngle};
     }

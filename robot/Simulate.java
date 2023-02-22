@@ -124,7 +124,7 @@ public class Simulate{
 
             g.setFont(new Font("Bold", 1, 20)); 
             g.drawString((Double.toString(x_coordinate) + " " + Double.toString(y_coordinate)), 100, 100);        
-            g.drawString((Double.toString(angle[0]) + " " + Double.toString(angle[1]) + " " + Double.toString(angle[2])), 100, 150);                      
+            g.drawString((Double.toString(angle[0]) + " " + Double.toString(angle[1]) + " " + Double.toString(angle[2])), 100, 150);     
         }
         public void updateCoordinates(int x, int y){
             x_click = x;
@@ -134,8 +134,9 @@ public class Simulate{
             double[] angles = InverseKinematicsUtil.getAnglesFromCoordinates(x_coordinate, y_coordinate, 0, flipped);
             if (!Double.isNaN(angles[0])){
                 angle = angles;
-                last_X = (int)x_click;
-                last_Y = (int)y_click;
+                double coords[] = ForwardKinematicsUtil.getCoordinatesFromAngles(angles[0], angles[1], angles[2]);
+                last_X = CENTER_X - convertInchestoPixel(coords[0]);
+                last_Y = HEIGHT - convertInchestoPixel(coords[1]);
                 y_2 = (int)(HEIGHT + convertInchestoPixel(ArmConstants.LIMB1_LENGTH * Math.cos(Math.toRadians(angles[0]))));
                 x_2 = (int)(CENTER_X - convertInchestoPixel(ArmConstants.LIMB1_LENGTH * Math.sin(Math.toRadians(angles[0]))));
             }
