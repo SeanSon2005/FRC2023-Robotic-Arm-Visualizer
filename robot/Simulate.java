@@ -40,6 +40,8 @@ public class Simulate{
         private int last_X = 0;
         private int last_Y = 0;
         private double angle[] = {0.0,0.0,0.0};   
+        private double inv_x;
+        private double inv_y;
         
         public Canvas() {
             this.setPreferredSize(new Dimension(1000, 1000));
@@ -124,7 +126,8 @@ public class Simulate{
 
             g.setFont(new Font("Bold", 1, 20)); 
             g.drawString((Double.toString(x_coordinate) + " " + Double.toString(y_coordinate)), 100, 100);        
-            g.drawString((Double.toString(angle[0]) + " " + Double.toString(angle[1]) + " " + Double.toString(angle[2])), 100, 150);     
+            g.drawString((Double.toString(angle[0]) + " " + Double.toString(angle[1]) + " " + Double.toString(angle[2])), 100, 150); 
+            g.drawString((Double.toString(inv_x) + " " + Double.toString(inv_y)), 100 ,200);    
         }
         public void updateCoordinates(int x, int y){
             x_click = x;
@@ -135,8 +138,10 @@ public class Simulate{
             if (!Double.isNaN(angles[0])){
                 angle = angles;
                 double coords[] = ForwardKinematicsUtil.getCoordinatesFromAngles(angles[0], angles[1], angles[2]);
+                inv_x = coords[0];
+                inv_y = coords[1];
                 last_X = CENTER_X - convertInchestoPixel(coords[0]);
-                last_Y = HEIGHT - convertInchestoPixel(coords[1]);
+                last_Y = HEIGHT*2 - convertInchestoPixel(coords[1]);
                 y_2 = (int)(HEIGHT + convertInchestoPixel(ArmConstants.LIMB1_LENGTH * Math.cos(Math.toRadians(angles[0]))));
                 x_2 = (int)(CENTER_X - convertInchestoPixel(ArmConstants.LIMB1_LENGTH * Math.sin(Math.toRadians(angles[0]))));
             }
@@ -163,6 +168,10 @@ public class Simulate{
         frame.add(new Canvas());
         frame.pack();
         frame.setVisible(true);
+        double[] initCoords = ForwardKinematicsUtil.getCoordinatesFromAngles(ArmConstants.ARM_1_INITIAL_ANGLE, ArmConstants.ARM_2_INITIAL_ANGLE, 0);
+        System.out.println("x " + initCoords[0] + ", y " + initCoords[1]);
+        double[] initAngles = InverseKinematicsUtil.getAnglesFromCoordinates(initCoords[0], initCoords[1], initCoords[2], false);
+        System.out.println("ang1: " + initAngles[0] + ", ang2 " + initAngles[1]);
       
     }
     public static double convertPixeltoInches(int pixel){

@@ -1,72 +1,74 @@
 package robot;
 import robot.Constants.ArmConstants;
 
+/**
+ * Inverse Kinematics helper for the arm
+ */
 public final class InverseKinematicsUtil {
-    private static double x_pos, y_pos, z_pos;
-
     private InverseKinematicsUtil() {
         throw new UnsupportedOperationException("InverseKinematicsUtil is a utility class and cannot be instantiated");
     }
 
     /**
      * calculate arm angles relative to limb that it's attached to
+     *
+     * @param x       X coordinate
+     * @param y       Y coordinate
+     * @param z       Z coordinate
+     * @param flipped Whether the arm should attempt to approach from above rather than from the side (true for above, false for side)
+     * @return The angles: [angle_limb_1, angle_limb_2, turret_angle]
      */
     public static double[] getAnglesFromCoordinates(double x, double y, double z, boolean flipped) {
-        double a1, a2, turretAngle;
-        double adjusted_y = y - ArmConstants.ORIGIN_HEIGHT;   // calculate height relative to the origin (at the tip of the non-moving rod which holds the arm)
-        double adjusted_x = x;
-        if (x < 5){
-            adjusted_x = 5;
-        }
-        double adjusted_z = z;
-        double dist3d = MathUtil.distance(0, adjusted_x, 0, adjusted_y, 0, z);     // calc distance in 3d from top pivot point
-        double totalLimbLength = ArmConstants.LIMB1_LENGTH + ArmConstants.LIMB2_LENGTH;
-        if(dist3d > totalLimbLength) {
-            adjusted_x *= (totalLimbLength / dist3d); 
-            adjusted_y *= (totalLimbLength / dist3d);
-            adjusted_z *= (totalLimbLength / dist3d); 
-            x_pos = adjusted_x;
-            y_pos = adjusted_y;
-            z_pos = adjusted_z;
+        
+        double pivot1Angle, pivot2Angle, turretAngle;
+        
+        y = Math.min(y, 75); //cap arm height at 75 inches above the ground
+
+        double adjusted_y = y - ArmConstants.ORIGIN_HEIGHT;
+        double adjusted_x = Math.abs(x);
+
+        // Turret angle calculations
+        double angleCalc = Math.toDegrees(Math.atan2(z, x));
+        turretAngle = angleCalc < 0 ? 360 + angleCalc : angleCalc;
+        
+        // distance reach boundar
+        double dist3d = MathUtil.distance(0, adjusted_x, 0, adjusted_y, 0, z); // calc distance in 3d from top pivot point
+        if(dist3d > ArmConstants.LIMB1_LENGTH + ArmConstants.LIMB2_LENGTH) { // If distance reach is impossible then just return saved angles
+            return new double[]{Double.NaN, Double.NaN, Double.NaN};
         }
 
-        if (dist3d == 0) { //zero, zero on coordinate -> prevent divide by 0 exception
-            return new double[] {0,0,0};
-        }           
-        a2 = MathUtil.lawOfCosinesForAngle(ArmConstants.LIMB1_LENGTH, ArmConstants.LIMB2_LENGTH, dist3d); // a2 is angle between 1st arm segment to 2nd arm segment
-        a1 = MathUtil.angleBetweenLines(0, -1, 0, adjusted_x, adjusted_y, adjusted_z) - MathUtil.lawOfSinesForAngle(a2, dist3d, ArmConstants.LIMB2_LENGTH);   // a1 is angle between verticle to 1st arm segment
+        //inverse kinematics but it looks "simple"
+        pivot2Angle = MathUtil.lawOfCosinesForAngle(ArmConstants.LIMB1_LENGTH, ArmConstants.LIMB2_LENGTH, dist3d); // pivot2Angle is angle between 1st arm segment to 2nd arm segment
+        pivot1Angle = (90 + Math.toDegrees(Math.atan(adjusted_y/MathUtil.distance(adjusted_x, 0, z, 0)))) - MathUtil.lawOfCosinesForAngle(dist3d, ArmConstants.LIMB1_LENGTH, ArmConstants.LIMB2_LENGTH);   // pivot1Angle is angle between verticle to 1st arm segment
        
-        //if flipped is true, return angles that are "flipped" 
+        // If flipped is true, return angles that are "flipped" 
         if(flipped){
-            double angleCalc = Math.toDegrees(Math.atan2(adjusted_x, -y + ArmConstants.ORIGIN_HEIGHT));
+            angleCalc = Math.toDegrees(Math.atan2(adjusted_x, -y + ArmConstants.ORIGIN_HEIGHT));
             double lineAngle = angleCalc < 0 ? 360 + angleCalc : angleCalc;
-            a1 = lineAngle*2 - a1;
-            a2 = 360 - a2;
-            if (a1 > 350){
-                a1 = 350;
+            pivot1Angle = lineAngle * 2 - pivot1Angle;
+            pivot2Angle = 360 - pivot2Angle;
+            if (pivot1Angle > 350) {
+                pivot1Angle = 350;
             }
-            if(a2 > 345){
-                a2 = 345;
+            if(pivot2Angle > 340) {
+                pivot2Angle = 340;
             }
         }
         else{
-            if (a1 < 10){
-                a1 = 10;
+            if (pivot1Angle < ArmConstants.ARM_1_INITIAL_ANGLE) {
+                pivot1Angle = ArmConstants.ARM_1_INITIAL_ANGLE;
             }
-            if(a2 < 15){
-                a2 = 15;
+            if(pivot2Angle < ArmConstants.ARM_2_INITIAL_ANGLE) {
+                pivot2Angle = ArmConstants.ARM_2_INITIAL_ANGLE;
             }
         }
-        
 
-        //turret angle calculations
-        double angleCalc = Math.toDegrees(Math.atan2(z, x));
-        turretAngle = angleCalc < 0 ? 360 + angleCalc : angleCalc;
+        if(turretAngle > 180) {
+            turretAngle -= 360;
+        } else if(turretAngle < -180) {
+            turretAngle += 360;
+        }
 
-        return new double[] {a1, a2, turretAngle};
-    }
-
-    public static double[] getCurrentCoordinates() {
-        return new double[] {x_pos, y_pos, z_pos};
+        return new double[] {pivot1Angle, pivot2Angle, turretAngle};
     }
 }

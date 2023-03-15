@@ -16,8 +16,8 @@ public final class Constants {
 
     // All constants are in inches
     public static final double ORIGIN_HEIGHT = 49.5; 
-    public static final double LIMB1_LENGTH = 27;
-    public static final double LIMB2_LENGTH = 20 + 10;
+    public static final double LIMB1_LENGTH = 28.5;
+    public static final double LIMB2_LENGTH = 32;
 
     public static final double ANGLE_DELTA = 2;
 
@@ -29,6 +29,8 @@ public final class Constants {
     public static final double STARTING_Z = 0;
 
     public static final double PICK_UP_POSITION_Y = 5;
+    public static final double ARM_1_INITIAL_ANGLE = 10;
+    public static final double ARM_2_INITIAL_ANGLE = 20;
   }
 
   public static class ClawConstants {
